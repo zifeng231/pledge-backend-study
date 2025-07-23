@@ -6,7 +6,51 @@ var Config *ConfigStruct
 
 type ConfigStruct struct {
 	//变量名  +  类型
-	Mysql MysqlConfig
+	Mysql        MysqlConfig
+	Redis        RedisConfig
+	TestNet      TestNetConfig
+	MainNet      MainNetConfig
+	Token        TokenConfig
+	Email        EmailConfig
+	DefaultAdmin DefaultAdminConfig
+	Threshold    ThresholdConfig
+	Jwt          JwtConfig
+	Env          EnvConfig
+}
+
+type EnvConfig struct {
+	Port               string `toml:"port"`
+	Version            string `toml:"version"`
+	Protocol           string `toml:"protocol"`
+	DomainName         string `toml:"domain_name"`
+	TaskDuration       int64  `toml:"task_duration"`
+	WssTimeoutDuration int64  `toml:"wss_timeout_duration"`
+	TaskExtendDuration int64  `toml:"task_extend_duration"`
+}
+
+type ThresholdConfig struct {
+	PledgePoolTokenThresholdBnb string `toml:"pledge_pool_token_threshold_bnb"`
+}
+
+type EmailConfig struct {
+	Username string   `toml:"username"`
+	Pwd      string   `toml:"pwd"`
+	Host     string   `toml:"host"`
+	Port     string   `toml:"port"`
+	From     string   `toml:"from"`
+	Subject  string   `toml:"subject"`
+	To       []string `toml:"to"`
+	Cc       []string `toml:"cc"`
+}
+
+type DefaultAdminConfig struct {
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+}
+
+type JwtConfig struct {
+	SecretKey  string `toml:"secret_key"`
+	ExpireTime int    `toml:"expire_time"` // duration, s
 }
 
 //定义所有的config的结构体
@@ -56,4 +100,8 @@ type RedisConfig struct {
 	MaxIdle     int    `toml:"max_idle"`
 	MaxActive   int    `toml:"max_active"`
 	IdleTimeout int    `toml:"idle_timeout"`
+}
+
+type TokenConfig struct {
+	LogoUrl string `toml:"logo_url"`
 }
