@@ -84,3 +84,33 @@ func RedisGet(key string) (interface{}, error) {
 	}
 	return bytes, nil
 }
+
+// RedisGetString 获取Key
+func RedisGetString(key string) (string, error) {
+	conn := RedisConn.Get()
+	defer func() {
+		_ = conn.Close()
+	}()
+	reply, err := redis.String(conn.Do("get", key))
+	if err != nil {
+		return "", err
+	}
+	return reply, nil
+}
+
+func RedisSetString(key string, data string, aliveSeconds int) error {
+	conn := RedisConn.Get()
+	defer func() {
+		_ = conn.Close()
+	}()
+	var err error
+	if aliveSeconds > 0 {
+		_, err = redis.String(conn.Do("set", key, data, "EX", aliveSeconds))
+	} else {
+		_, err = redis.String(conn.Do("set", key, data))
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
