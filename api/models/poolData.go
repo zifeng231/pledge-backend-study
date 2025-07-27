@@ -1,5 +1,7 @@
 package models
 
+import "pledge-backend-study/db"
+
 type PoolData struct {
 	Id                     int    `json:"-" gorm:"column:id;primaryKey;autoIncrement"`
 	PoolID                 int    `json:"pool_id" gorm:"column:pool_id;"`
@@ -12,4 +14,34 @@ type PoolData struct {
 	SettleAmountLend       string `json:"settle_amount_lend" gorm:"column:settle_amount_lend"`
 	CreatedAt              string `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt              string `json:"updated_at" gorm:"column:updated_at"`
+}
+
+type PoolDataInfoRes struct {
+	Index    int      `json:"index"`
+	PoolData PoolData `json:"pool_data"`
+}
+
+func NewPoolData() *PoolData {
+	return &PoolData{}
+}
+
+func (p *PoolData) TableName() string {
+	return "pooldata"
+}
+
+func (p *PoolData) PoolDataInfo(chainId int, res *[]PoolDataInfoRes) error {
+	var poolData []PoolData
+
+	err := db.Mysql.Table("pooldata").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolData).Debug().Error
+	if err != nil {
+		return err
+	}
+
+	for _, v := range poolData {
+		*res = append(*res, PoolDataInfoRes{
+			Index:    v.PoolID - 1,
+			PoolData: v,
+		})
+	}
+	return nil
 }

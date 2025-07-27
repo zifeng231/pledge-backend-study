@@ -69,21 +69,20 @@ func RedisSet(key string, value interface{}, expire int) error {
 	return nil
 }
 
-//获取value
-
-func RedisGet(key string) (interface{}, error) {
+// RedisGet 获取Key
+func RedisGet(key string) ([]byte, error) {
 	conn := RedisConn.Get()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Logger.Error("redis close err")
-		}
+		_ = conn.Close()
 	}()
-	bytes, err := redis.Bytes(conn.Do("GET", key))
+	reply, err := redis.Bytes(conn.Do("get", key))
 	if err != nil {
 		return nil, err
 	}
-	return bytes, nil
+	return reply, nil
 }
+
+//获取value
 
 // RedisGetString 获取Key
 func RedisGetString(key string) (string, error) {
@@ -109,6 +108,28 @@ func RedisSetString(key string, data string, aliveSeconds int) error {
 	} else {
 		_, err = redis.String(conn.Do("set", key, data))
 	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// RedisDelete 删除Key
+func RedisDelete(key string) (bool, error) {
+	conn := RedisConn.Get()
+	defer func() {
+		_ = conn.Close()
+	}()
+	return redis.Bool(conn.Do("del", key))
+}
+
+// RedisFlushDB 清空当前DB
+func RedisFlushDB() error {
+	conn := RedisConn.Get()
+	defer func() {
+		_ = conn.Close()
+	}()
+	_, err := conn.Do("flushdb")
 	if err != nil {
 		return err
 	}
